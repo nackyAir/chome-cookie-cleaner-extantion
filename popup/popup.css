@@ -8,45 +8,162 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 14px;
   color: #333;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 }
 
 .container {
-  width: 320px;
+  width: 360px;
   padding: 16px;
 }
 
-h1 {
-  font-size: 18px;
-  font-weight: 600;
+/* ヘッダー */
+.header {
   margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.header h1 {
+  font-size: 16px;
+  font-weight: 600;
   color: #1a1a1a;
   text-align: center;
 }
 
-.origin-display {
+/* サイト情報ブロック */
+.site-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background-color: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-.origin-display .label {
-  display: block;
+.site-favicon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.site-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.site-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-origin {
   font-size: 12px;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.origin-display .url {
-  display: block;
-  font-size: 13px;
   color: #1a73e8;
   word-break: break-all;
-  font-weight: 500;
 }
 
+/* 説明エリア */
+.description {
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.description p {
+  font-size: 12px;
+  color: #6d4c00;
+  line-height: 1.5;
+}
+
+/* オプション */
+.options {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.options-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.option-item:hover {
+  background-color: #f8f9fa;
+  margin: 0 -8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.option-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1a73e8;
+  cursor: pointer;
+}
+
+.option-label {
+  font-size: 13px;
+  color: #333;
+}
+
+/* ステータス表示 */
+.status {
+  padding: 10px 12px;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 6px;
+  display: none;
+  margin-bottom: 12px;
+}
+
+.status.success {
+  display: block;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.status.error {
+  display: block;
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.status.info {
+  display: block;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+/* 実行ボタン */
 .clear-button {
   width: 100%;
   padding: 12px 16px;
@@ -57,11 +174,15 @@ h1 {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .clear-button:hover:not(:disabled) {
   background-color: #b71c1c;
+}
+
+.clear-button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .clear-button:disabled {
@@ -69,23 +190,15 @@ h1 {
   cursor: not-allowed;
 }
 
-.status {
+/* フッター */
+.footer {
   margin-top: 12px;
-  padding: 8px 12px;
-  font-size: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
   text-align: center;
-  border-radius: 4px;
-  display: none;
 }
 
-.status.success {
-  display: block;
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status.error {
-  display: block;
-  background-color: #ffebee;
-  color: #c62828;
+.last-cleared {
+  font-size: 11px;
+  color: #888;
 }
