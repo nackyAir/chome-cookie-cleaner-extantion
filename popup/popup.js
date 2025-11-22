@@ -108,8 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         options: {
           cookies: true,
           cache: true,
-          localStorage: true,
-          sessionStorage: true
+          localStorage: true
         }
       });
 

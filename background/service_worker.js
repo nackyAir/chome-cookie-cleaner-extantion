@@ -67,11 +67,12 @@ async function clearOriginData(origin, options = {}) {
 
   log('Clearing data for origin:', origin);
 
+  // chrome.browsingData.removeでサポートされているデータタイプ
+  // 注意: sessionStorageはサポートされていない（タブを閉じると自動的にクリアされる）
   const dataTypes = {
     cookies: options.cookies !== false,
     cache: options.cache !== false,
-    localStorage: options.localStorage !== false,
-    sessionStorage: options.sessionStorage !== false
+    localStorage: options.localStorage !== false
   };
 
   try {
