@@ -1,6 +1,33 @@
 // popup.js - Origin Auth Reset Popup Script
 
+const DEBUG = true;
+
+function log(...args) {
+  if (DEBUG) {
+    console.log('[Popup]', ...args);
+  }
+}
+
+function logError(...args) {
+  console.error('[Popup]', ...args);
+}
+
+// Service Workerにメッセージを送信
+async function sendMessage(message) {
+  log('Sending message:', message);
+  try {
+    const response = await chrome.runtime.sendMessage(message);
+    log('Received response:', response);
+    return response;
+  } catch (error) {
+    logError('Failed to send message:', error);
+    throw error;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  log('Popup loaded');
+
   const originUrlElement = document.getElementById('origin-url');
   const clearButton = document.getElementById('clear-btn');
   const statusElement = document.getElementById('status');
@@ -19,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     } catch (error) {
-      console.error('Failed to get current tab:', error);
+      logError('Failed to get current tab:', error);
     }
     return null;
   }
@@ -35,16 +62,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 3000);
   }
 
+  // Service Workerの接続確認
+  async function checkServiceWorkerConnection() {
+    try {
+      const response = await sendMessage({ type: 'PING' });
+      if (response && response.success) {
+        log('Service Worker connection verified');
+        return true;
+      }
+    } catch (error) {
+      logError('Service Worker not responding:', error);
+    }
+    return false;
+  }
+
   // 初期化
   currentOrigin = await getCurrentTabOrigin();
 
   if (currentOrigin) {
     originUrlElement.textContent = currentOrigin;
     clearButton.disabled = false;
+    log('Current origin:', currentOrigin);
   } else {
     originUrlElement.textContent = '対応していないページです';
     clearButton.disabled = true;
+    log('No valid origin found');
   }
+
+  // Service Worker接続確認（デバッグ用）
+  await checkServiceWorkerConnection();
 
   // クリアボタンのクリックイベント
   clearButton.addEventListener('click', async () => {
@@ -52,24 +98,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     clearButton.disabled = true;
     clearButton.textContent = 'クリア中...';
+    log('Clear button clicked for origin:', currentOrigin);
 
     try {
-      // browsingDataを使用してオリジンのデータをクリア
-      await chrome.browsingData.remove(
-        {
-          origins: [currentOrigin]
-        },
-        {
+      // Service Workerにクリア要求を送信
+      const response = await sendMessage({
+        type: 'CLEAR_ORIGIN_DATA',
+        origin: currentOrigin,
+        options: {
           cookies: true,
           cache: true,
-          localStorage: true,
-          sessionStorage: true
+          localStorage: true
         }
-      );
+      });
 
-      showStatus('認証情報をクリアしました', 'success');
+      if (response && response.success) {
+        log('Data cleared successfully:', response);
+        showStatus('認証情報をクリアしました', 'success');
+      } else {
+        throw new Error(response?.error || 'Unknown error');
+      }
     } catch (error) {
-      console.error('Failed to clear data:', error);
+      logError('Failed to clear data:', error);
       showStatus('クリアに失敗しました', 'error');
     } finally {
       clearButton.disabled = false;
