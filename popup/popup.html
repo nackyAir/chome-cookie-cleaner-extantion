@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Origin Auth Reset</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Origin Auth Reset</h1>
+    <div id="current-origin" class="origin-display">
+      <span class="label">現在のオリジン:</span>
+      <span id="origin-url" class="url">読み込み中...</span>
+    </div>
+    <button id="clear-btn" class="clear-button" disabled>
+      認証情報をクリア
+    </button>
+    <div id="status" class="status"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

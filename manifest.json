@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Origin Auth Reset",
+  "version": "1.0.0",
+  "description": "現在のオリジンに関連するCookie、キャッシュ、認証情報をワンクリックでクリアするChrome拡張機能",
+  "permissions": [
+    "tabs",
+    "browsingData",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "background": {
+    "service_worker": "background/service_worker.js"
+  }
+}
