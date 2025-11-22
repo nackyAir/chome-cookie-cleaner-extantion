@@ -8,15 +8,58 @@
 </head>
 <body>
   <div class="container">
-    <h1>Origin Auth Reset</h1>
-    <div id="current-origin" class="origin-display">
-      <span class="label">現在のオリジン:</span>
-      <span id="origin-url" class="url">読み込み中...</span>
-    </div>
+    <!-- ヘッダー -->
+    <header class="header">
+      <h1>Origin Auth Reset</h1>
+    </header>
+
+    <!-- サイト情報ブロック -->
+    <section class="site-info">
+      <img id="site-favicon" class="site-favicon" src="" alt="" />
+      <div class="site-details">
+        <span id="site-title" class="site-title">読み込み中...</span>
+        <span id="site-origin" class="site-origin">-</span>
+      </div>
+    </section>
+
+    <!-- 説明エリア -->
+    <section class="description">
+      <p>このサイトの認証情報とキャッシュをクリアします。クリア後は再ログインが必要になる場合があります。</p>
+    </section>
+
+    <!-- オプション -->
+    <section class="options">
+      <h2 class="options-title">クリアする項目</h2>
+      <label class="option-item">
+        <input type="checkbox" id="opt-cookies" checked />
+        <span class="option-label">Cookie（認証情報）</span>
+      </label>
+      <label class="option-item">
+        <input type="checkbox" id="opt-cache" checked />
+        <span class="option-label">キャッシュ</span>
+      </label>
+      <label class="option-item">
+        <input type="checkbox" id="opt-localstorage" checked />
+        <span class="option-label">ローカルストレージ</span>
+      </label>
+      <label class="option-item">
+        <input type="checkbox" id="opt-sessionstorage" />
+        <span class="option-label">セッションストレージ</span>
+      </label>
+    </section>
+
+    <!-- ステータス表示エリア -->
+    <div id="status" class="status"></div>
+
+    <!-- 実行ボタン -->
     <button id="clear-btn" class="clear-button" disabled>
       認証情報をクリア
     </button>
-    <div id="status" class="status"></div>
+
+    <!-- フッター -->
+    <footer class="footer">
+      <span id="last-cleared" class="last-cleared">前回実行: -</span>
+    </footer>
   </div>
   <script src="popup.js"></script>
 </body>
