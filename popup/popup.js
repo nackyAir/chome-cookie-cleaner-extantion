@@ -1,6 +1,33 @@
 // popup.js - Origin Auth Reset Popup Script
 
+const DEBUG = true;
+
+function log(...args) {
+  if (DEBUG) {
+    console.log('[Popup]', ...args);
+  }
+}
+
+function logError(...args) {
+  console.error('[Popup]', ...args);
+}
+
+// Service Workerにメッセージを送信
+async function sendMessage(message) {
+  log('Sending message:', message);
+  try {
+    const response = await chrome.runtime.sendMessage(message);
+    log('Received response:', response);
+    return response;
+  } catch (error) {
+    logError('Failed to send message:', error);
+    throw error;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  log('Popup loaded');
+
   // DOM要素の取得
   const siteFavicon = document.getElementById('site-favicon');
   const siteTitle = document.getElementById('site-title');
@@ -16,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const optSessionStorage = document.getElementById('opt-sessionstorage');
 
   let currentOrigin = null;
-  let currentTab = null;
 
   // 現在のタブの情報を取得
   async function getCurrentTabInfo() {
@@ -34,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     } catch (error) {
-      console.error('Failed to get current tab:', error);
+      logError('Failed to get current tab:', error);
     }
     return null;
   }
@@ -59,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         lastClearedElement.textContent = `前回実行: ${formatDate(date)}`;
       }
     } catch (error) {
-      console.error('Failed to load last cleared:', error);
+      logError('Failed to load last cleared:', error);
     }
   }
 
@@ -72,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await chrome.storage.local.set({ lastCleared });
       lastClearedElement.textContent = `前回実行: ${formatDate(new Date())}`;
     } catch (error) {
-      console.error('Failed to save last cleared:', error);
+      logError('Failed to save last cleared:', error);
     }
   }
 
@@ -84,6 +110,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}/${month}/${day} ${hours}:${minutes}`;
+  }
+
+  // Service Workerの接続確認
+  async function checkServiceWorkerConnection() {
+    try {
+      const response = await sendMessage({ type: 'PING' });
+      if (response && response.success) {
+        log('Service Worker connection verified');
+        return true;
+      }
+    } catch (error) {
+      logError('Service Worker not responding:', error);
+    }
+    return false;
   }
 
   // 初期化
@@ -105,12 +145,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     clearButton.disabled = false;
     await loadLastCleared();
+    log('Current origin:', currentOrigin);
   } else {
     siteTitle.textContent = '対応していないページです';
     siteOrigin.textContent = 'http/https ページでのみ動作します';
     siteFavicon.style.display = 'none';
     clearButton.disabled = true;
+    log('No valid origin found');
   }
+
+  // Service Worker接続確認（デバッグ用）
+  await checkServiceWorkerConnection();
 
   // クリアボタンのクリックイベント
   clearButton.addEventListener('click', async () => {
@@ -132,27 +177,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     clearButton.disabled = true;
     clearButton.textContent = 'クリア中...';
+    log('Clear button clicked for origin:', currentOrigin);
 
     try {
-      // browsingDataを使用してオリジンのデータをクリア
-      await chrome.browsingData.remove(
-        {
-          origins: [currentOrigin]
-        },
-        options
-      );
+      // Service Workerにクリア要求を送信
+      const response = await sendMessage({
+        type: 'CLEAR_ORIGIN_DATA',
+        origin: currentOrigin,
+        options: options
+      });
 
-      await saveLastCleared();
+      if (response && response.success) {
+        log('Data cleared successfully:', response);
+        await saveLastCleared();
 
-      const clearedItems = [];
-      if (options.cookies) clearedItems.push('Cookie');
-      if (options.cache) clearedItems.push('キャッシュ');
-      if (options.localStorage) clearedItems.push('ローカルストレージ');
-      if (options.sessionStorage) clearedItems.push('セッションストレージ');
+        const clearedItems = [];
+        if (options.cookies) clearedItems.push('Cookie');
+        if (options.cache) clearedItems.push('キャッシュ');
+        if (options.localStorage) clearedItems.push('ローカルストレージ');
+        if (options.sessionStorage) clearedItems.push('セッションストレージ');
 
-      showStatus(`${clearedItems.join('、')}をクリアしました`, 'success');
+        showStatus(`${clearedItems.join('、')}をクリアしました`, 'success');
+      } else {
+        throw new Error(response?.error || 'Unknown error');
+      }
     } catch (error) {
-      console.error('Failed to clear data:', error);
+      logError('Failed to clear data:', error);
       showStatus('クリアに失敗しました', 'error');
     } finally {
       clearButton.disabled = false;
